@@ -17,7 +17,7 @@ This installation guide will be split into instruction for installing the ROS 2 
 - **ROS 2** Follow the instructions [here](https://docs.ros.org/en/humble/Installation.html) to install ROS 2 Humble.
 - **F1TENTH Gym**
   ```bash
-  git clone https://github.com/zodiuxus/f1tenth_gym
+  git clone https://github.com/f1tenth/f1tenth_gym
   cd f1tenth_gym && pip3 install -e .
   ```
 
