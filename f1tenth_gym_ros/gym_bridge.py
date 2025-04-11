@@ -66,6 +66,10 @@ class GymBridge(Node):
         self.declare_parameter('stheta1')
         self.declare_parameter('kb_teleop')
 
+        self.declare_parameter('ego_teleop_topic')
+        self.declare_parameter('opp_teleop_topic')
+        
+
         # check num_agents
         num_agents = self.get_parameter('num_agent').value
         if num_agents < 1 or num_agents > 2:
@@ -97,7 +101,9 @@ class GymBridge(Node):
         self.ego_namespace = self.get_parameter('ego_namespace').value
         ego_odom_topic = self.ego_namespace + '/' + self.get_parameter('ego_odom_topic').value
         self.scan_distance_to_base_link = self.get_parameter('scan_distance_to_base_link').value
-        
+        teleop_ego = self.get_parameter('ego_teleop_topic').value
+        teleop_opp = self.get_parameter('opp_teleop_topic').value
+       
         if num_agents == 2:
             self.has_opp = True
             self.opp_namespace = self.get_parameter('opp_namespace').value
@@ -167,11 +173,17 @@ class GymBridge(Node):
                 10)
 
         if self.get_parameter('kb_teleop').value:
-            self.teleop_sub = self.create_subscription(
+            self.teleop_sub_ego = self.create_subscription(
                 Twist,
-                '/cmd_vel',
-                self.teleop_callback,
+                teleop_ego,
+                self.teleop_callback_ego,
                 10)
+            if num_agents == 2:
+                self.teleop_sub_opp= self.create_subscription(
+                    Twist,
+                    teleop_opp,
+                    self.teleop_callback_opp,
+                    10)
 
 
     def drive_callback(self, drive_msg):
@@ -208,7 +220,21 @@ class GymBridge(Node):
             rqw = pose_msg.pose.orientation.w
             _, _, rtheta = euler.quat2euler([rqw, rqx, rqy, rqz], axes='sxyz')
             self.obs, _ , self.done, _ = self.env.reset(np.array([list(self.ego_pose), [rx, ry, rtheta]]))
-    def teleop_callback(self, twist_msg):
+
+    def teleop_callback_opp(self, twist_msg):
+        if not self.opp_drive_published:
+            self.opp_drive_published = True
+
+        self.opp_requested_speed = twist_msg.linear.x
+
+        if twist_msg.angular.z > 0.0:
+            self.opp_steer = 0.3
+        elif twist_msg.angular.z < 0.0:
+            self.opp_steer = -0.3
+        else:
+            self.opp_steer = 0.0
+
+    def teleop_callback_ego(self, twist_msg):
         if not self.ego_drive_published:
             self.ego_drive_published = True
 

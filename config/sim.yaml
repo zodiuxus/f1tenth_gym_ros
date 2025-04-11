@@ -28,11 +28,13 @@ bridge:
     ego_odom_topic: 'odom'
     ego_opp_odom_topic: 'opp_odom'
     ego_drive_topic: 'drive'
+    ego_teleop_topic: 'ego_vel'
     opp_namespace: 'opp_racecar'
     opp_scan_topic: 'opp_scan'
     opp_odom_topic: 'odom'
     opp_ego_odom_topic: 'opp_odom'
     opp_drive_topic: 'opp_drive'
+    opp_teleop_topic: 'opp_vel'
 
     # transform related
     scan_distance_to_base_link: 0.0
@@ -46,7 +48,7 @@ bridge:
     map_img_ext: '.png'
 
     # opponent parameters
-    num_agent: 1
+    num_agent: 2
 
     # ego starting pose on map
     sx: 0.0
