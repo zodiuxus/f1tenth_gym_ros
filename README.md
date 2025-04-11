@@ -17,7 +17,7 @@ This installation guide will be split into instruction for installing the ROS 2 
 - **ROS 2** Follow the instructions [here](https://docs.ros.org/en/humble/Installation.html) to install ROS 2 Humble.
 - **F1TENTH Gym**
   ```bash
-  git clone https://github.com/f1tenth/f1tenth_gym
+  git clone https://github.com/zodiuxus/f1tenth_gym
   cd f1tenth_gym && pip3 install -e .
   ```
 
@@ -26,7 +26,7 @@ This installation guide will be split into instruction for installing the ROS 2 
 - Clone the repo into the workspace:
   ```bash
   cd $HOME/sim_ws/src
-  git clone https://github.com/f1tenth/f1tenth_gym_ros
+  git clone https://github.com/zodiuxus/f1tenth_gym_ros
   ```
 - Update correct parameter for path to map file:
   Go to `sim.yaml` [https://github.com/f1tenth/f1tenth_gym_ros/blob/main/config/sim.yaml](https://github.com/f1tenth/f1tenth_gym_ros/blob/main/config/sim.yaml) in your cloned repo, change the `map_path` parameter to point to the correct location. It should be `'<your_home_dir>/sim_ws/src/f1tenth_gym_ros/maps/levine'`
@@ -163,5 +163,5 @@ The config file can be edited to change which topics the ego and opp racers subs
 
 There are multiple ways to launch your own agent to control the vehicles.
 
-- The first one is creating a new package for your agent in the `/sim_ws` workspace inside the sim container. After launch the simulation, launch the agent node in another bash session while the sim is running.
+- The first one is creating a new package for your agent in the `/sim_ws` workspace inside the sim container. After launching the simulation, launch the agent node in another bash session while the sim is running.
 - The second one is to create a new ROS 2 container for you agent node. Then create your own package and nodes inside. Launch the sim container and the agent container both. With default networking configurations for `docker`, the behavior is to put The two containers on the same network, and they should be able to discover and talk to each other on different topics. If you're using noVNC, create a new service in `docker-compose.yml` for your agent node. You'll also have to put your container on the same network as the sim and novnc containers.
