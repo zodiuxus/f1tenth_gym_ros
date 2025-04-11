@@ -5,16 +5,16 @@ This is a containerized ROS communication bridge for the F1TENTH gym environment
 
 **Supported System:**
 
-- Ubuntu (tested on 20.04) native with ROS 2
-- Ubuntu (tested on 20.04) with an NVIDIA gpu and nvidia-docker2 support
+- Ubuntu (tested on 22.04) native with ROS 2
+- Ubuntu (tested on 22.04) with an NVIDIA gpu and nvidia-docker2 support
 - Windows 10, macOS, and Ubuntu without an NVIDIA gpu (using noVNC)
 
 This installation guide will be split into instruction for installing the ROS 2 package natively, and for systems with or without an NVIDIA gpu in Docker containers.
 
-## Native on Ubuntu 20.04
+## Native on Ubuntu 22.04
 
 **Install the following dependencies:**
-- **ROS 2** Follow the instructions [here](https://docs.ros.org/en/foxy/Installation.html) to install ROS 2 Foxy.
+- **ROS 2** Follow the instructions [here](https://docs.ros.org/en/humble/Installation.html) to install ROS 2 Humble.
 - **F1TENTH Gym**
   ```bash
   git clone https://github.com/f1tenth/f1tenth_gym
@@ -32,9 +32,9 @@ This installation guide will be split into instruction for installing the ROS 2 
   Go to `sim.yaml` [https://github.com/f1tenth/f1tenth_gym_ros/blob/main/config/sim.yaml](https://github.com/f1tenth/f1tenth_gym_ros/blob/main/config/sim.yaml) in your cloned repo, change the `map_path` parameter to point to the correct location. It should be `'<your_home_dir>/sim_ws/src/f1tenth_gym_ros/maps/levine'`
 - Install dependencies with rosdep:
   ```bash
-  source /opt/ros/foxy/setup.bash
+  source /opt/ros/humble/setup.bash
   cd ..
-  rosdep install -i --from-path src --rosdistro foxy -y
+  rosdep install -i --from-path src --rosdistro humble -y
   ```
 - Build the workspace: ```colcon build```
 
@@ -85,7 +85,7 @@ docker exec -it f1tenth_gym_ros-sim-1 /bin/bash
 1. `tmux` is included in the contianer, so you can create multiple bash sessions in the same terminal.
 2. To launch the simulation, make sure you source both the ROS2 setup script and the local workspace setup script. Run the following in the bash session from the container:
 ```bash
-$ source /opt/ros/foxy/setup.bash
+$ source /opt/ros/humble/setup.bash
 $ source install/local_setup.bash
 $ ros2 launch f1tenth_gym_ros gym_bridge_launch.py
 ```
@@ -144,13 +144,20 @@ In addition to all topics in the single agent scenario, these topics are also av
 
 `/goal_pose`: This is the topic for resetting the opponent agent's pose via RViz's 2D Goal Pose tool. Do **NOT** publish directly to this topic unless you know what you're doing.
 
-# Keyboard Teleop
+# Teleop
 
 The keyboard teleop node from `teleop_twist_keyboard` is also installed as part of the simulation's dependency. To enable keyboard teleop, set `kb_teleop` to `True` in `sim.yaml`. After launching the simulation, in another terminal, run:
 ```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=cmd_vel_in_config
 ```
 Then, press `i` to move forward, `u` and `o` to move forward and turn, `,` to move backwards, `m` and `.` to move backwards and turn, and `k` to stop in the terminal window running the teleop node.
+
+You can also install `teleop_twist_joy` to enable the same functionality using a controller. Use
+```bash
+ros2 launch teleop_twist_joy teleop-launch.py joy_vel:='cmd_vel_in_config' joy_config:='xbox' joy_dev:='0' # change joy_dev to 1 in a separate terminal for a 2nd controller
+```
+
+The config file can be edited to change which topics the ego and opp racers subscribe to. By default they are `ego_vel` and `opp_vel`.
 
 # Developing and creating your own agent in ROS 2
 
